@@ -1,0 +1,24 @@
+trigger TriggerProducts on Opportunity (after insert) {
+    
+    String priceBookName = 'Standard' ; 
+	List<String> productCodeList = new List<String>{'GC1040', 'IN7080', 'SL9040','GC3060', 'IN7060'}; 
+	List<PricebookEntry> pbeList = [Select Product2.ProductCode, UnitPrice, Product2Id, priceBook2Id From PricebookEntry  where Product2.ProductCode in :productCodeList and Pricebook2.Name = :priceBookName LIMIT 5 ]; 
+	
+	if(pbeList.size() > 0 ){
+		ID priceBookID = pbeList[0].priceBook2Id; 
+		List<OpportunityLineItem> oliList = new List<OpportunityLineItem>(); 		
+		for(Opportunity o: trigger.new){
+			for(PricebookEntry pbe: pbeList){
+				OpportunityLineItem oli = new OpportunityLineItem(); 
+				oli.OpportunityId = o.id; 
+				oli.PricebookEntryId = pbe.id; 
+				oli.Quantity = 1; 
+				oli.UnitPrice = pbe.UnitPrice; 
+				oliList.add(oli); 
+			}
+		}
+		insert oliList; 
+	
+	}//	if(pbeList.size() > 0 )
+
+}
