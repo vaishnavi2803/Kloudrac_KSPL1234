@@ -1,0 +1,3 @@
+AND($User.Id  <>  PRIORVALUE( OwnerId ),
+$Profile.Name  <> "System Administrator" ,
+  ISCHANGED( OwnerId ) )
